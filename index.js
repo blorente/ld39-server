@@ -4,6 +4,8 @@ const bodyParser = require('body-parser')
 const pg = require('pg');
 const connectionString = process.env.DATABASE_URL || 'postgres://postgres:dbpass@localhost:5433/ld';
 
+app.set('port', (process.env.PORT || 3000));
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -100,7 +102,7 @@ app.post('/upvote', function (req, res) {
 })
 
 app.listen(3000, function () {
-  console.log('Example app listening on port 3000!')
+  console.log('Example app listening on port ' + app.get('port'))
   const client = new pg.Client(connectionString);
   client.connect();
   const query = client.query(
