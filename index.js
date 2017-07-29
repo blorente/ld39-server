@@ -1,16 +1,8 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
-
-
 const pg = require('pg');
 const connectionString = process.env.DATABASE_URL || 'postgres://postgres:dbpass@localhost:5433/ld';
-
-const client = new pg.Client(connectionString);
-client.connect();
-const query = client.query(
-  'CREATE TABLE IF NOT EXISTS messages(id SERIAL PRIMARY KEY, content TEXT not null, upvotes INT)');
-query.on('end', () => { client.end(); });
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -109,4 +101,9 @@ app.post('/upvote', function (req, res) {
 
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!')
+  const client = new pg.Client(connectionString);
+  client.connect();
+  const query = client.query(
+    'CREATE TABLE IF NOT EXISTS messages(id SERIAL PRIMARY KEY, content TEXT not null, upvotes INT)');
+  query.on('end', () => { client.end(); });
 })
