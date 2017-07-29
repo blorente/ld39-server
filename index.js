@@ -101,7 +101,7 @@ app.post('/upvote', function (req, res) {
   });
 })
 
-app.listen(3000, function () {
+app.listen(app.get('port'), function () {
   console.log('Example app listening on port ' + app.get('port'))
   const client = new pg.Client(connectionString);
   client.connect();
