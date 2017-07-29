@@ -16,6 +16,19 @@ app.get('/', function (req, res) {
 app.get('/messages', function (req, res) {
   const results = [];
   // Get a Postgres client from the connection pool
+  const data = {
+    startid: parseInt(req.query.startid),
+    amount: parseInt(req.query.msgamount)
+  };
+
+  let querystring = ''
+  if (!data.startid) {
+    querystring = 'SELECT * FROM messages ORDER BY id ASC;'
+  } else if (!data.amount) {
+    querystring = 'SELECT * FROM messages WHERE id >= ' + data.startid + 'ORDER BY id ASC;'
+  } else {
+    querystring = 'SELECT * FROM messages WHERE id >= ' + data.startid + 'AND id < ' + (data.startid + data.amount) + ' ORDER BY id ASC;'
+  }
   pg.connect(connectionString, (err, client, done) => {
     // Handle connection errors
     if(err) {
@@ -24,7 +37,7 @@ app.get('/messages', function (req, res) {
       return res.status(500).json({success: false, data: err});
     }
     // SQL Query > Select Data
-    const query = client.query('SELECT * FROM messages ORDER BY id ASC;');
+    const query = client.query(querystring);
     // Stream results back one row at a time
     query.on('row', (row) => {
       results.push(row);
