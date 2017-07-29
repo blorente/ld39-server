@@ -23,6 +23,8 @@
   },
   "homepage": "https://github.com/blorente/ld39-server#readme",
   "dependencies": {
-    "express": "^4.15.3"
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "pg": "6.x"
   }
 }

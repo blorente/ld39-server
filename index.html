@@ -3,11 +3,42 @@
   <head>
     <meta charset="utf-8">
     <title>Custom LD39 Messages</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   </head>
   <body>
+    <div class="">
+    <h3>Send a message:</h3>
     <form class="" action="/message" method="post">
       <input type="text" name="message" value="">
       <input type="submit" name="" value="Send!">
     </form>
+    </div>
+
+    <div class="">
+      <h3>Upvote a message</h3>
+      <form class="" action="/upvote" method="post">
+        <select class="" name="Messages" id="allMessages">
+        </select>
+        <input type="submit" name="" value="Upvote!">
+      </form>
+    </div>
   </body>
+
+  <script type="text/javascript">
+    function getMessagesFromDB() {
+      return [
+        'Hiii(3)',
+        'Hellooo(5)',
+        'See ya!(6)',
+        'nooo(0)'
+      ]
+    }
+    const testMessages = getMessagesFromDB()
+    const allMessages = document.getElementById('allMessages')
+    const messageTemplate = '<option value="(msg)">(msg)</option>'
+    for (let i = 0; i < testMessages.length; i++) {
+      const thisMsg = messageTemplate.replace(/\(msg\)/g, testMessages[i])
+      allMessages.innerHTML += thisMsg
+    }
+  </script>
 </html>
