@@ -24,6 +24,12 @@
   "homepage": "https://github.com/blorente/ld39-server#readme",
   "dependencies": {
     "pg": "6.x",
-    "express": "^4.15.3"
+    "express": "^4.15.3",
+    "ioredis": "^3.1.2",
+    "redis": "^2.7.1"
+  },
+  "devDependencies": {
+    "ioredis": "^3.1.2",
+    "redis": "^2.7.1"
   }
 }

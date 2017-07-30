@@ -3,6 +3,7 @@ const app = express()
 const bodyParser = require('body-parser')
 const pg = require('pg');
 const connectionString = process.env.DATABASE_URL || 'postgres://postgres:dbpass@localhost:5433/ld';
+const book = require('./book.js');
 
 app.set('port', (process.env.PORT || 3000));
 
@@ -51,7 +52,9 @@ app.get('/messages', function (req, res) {
 })
 
 app.get('/bookstatus', function (req, res) {
-  res.send('Get Book Status from DB')
+  book.getBookStatus((status) => {
+    res.send(status);
+  })
 })
 
 app.post('/message', function (req, res) {
@@ -107,6 +110,7 @@ app.post('/upvote', function (req, res) {
         results.push(row);
       });
       // After all data is returned, close connection and return results
+      book.updateBookStatus(1);
       query.on('end', function() {
         done();
         return res.json(results);
