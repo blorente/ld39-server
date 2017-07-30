@@ -3,8 +3,8 @@ const redisurl = process.env.REDIS_URL || "localhost:6379";
 const redis = new Redis(redisurl);
 const redisport = 6379;
 
-const startingAmount = 1000;
-const interval = 3000;
+const startingAmount = process.env.START_AMOUNT || 20160;
+const interval = process.env.BOOK_INTERVAL || 5000;
 
 const updateBookStatus = function (amount) {
   getBookStatus((result) => {
@@ -24,4 +24,4 @@ const getBookStatus = function (cb) {
 module.exports.getBookStatus = getBookStatus;
 
 redis.set('bookstatus', startingAmount);
-setInterval(() => {updateBookStatus(-1)}, 5000);
+setInterval(() => {updateBookStatus(-1)}, interval);
