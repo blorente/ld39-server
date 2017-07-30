@@ -87,31 +87,35 @@ app.post('/message', function (req, res) {
 app.post('/upvote', function (req, res) {
   const results = [];
   // Grab data from the URL parameters
-  const id = parseInt(req.body.mid);
-  console.log('Upvoting msg ' + id);
-  // Get a Postgres client from the connection pool
-  pg.connect(connectionString, (err, client, done) => {
-    // Handle connection errors
-    if(err) {
-      done();
-      console.log(err);
-      return res.status(500).json({success: false, data: err});
-    }
-    // SQL Query > Update Data
-    client.query('UPDATE messages SET content=content, upvotes=upvotes + 1 WHERE id=($1)',
-    [id]);
-    // SQL Query > Select Data
-    const query = client.query("SELECT * FROM messages ORDER BY id ASC");
-    // Stream results back one row at a time
-    query.on('row', (row) => {
-      results.push(row);
+  let id = -1;
+  if (req.body.mid !== undefined) {
+    id = parseInt(req.body.mid);
+    console.log('Upvoting msg ' + id);
+    pg.connect(connectionString, (err, client, done) => {
+      if(err) {
+        done();
+        console.log(err);
+        return res.status(500).json({success: false, data: err});
+      }
+      // SQL Query > Update Data
+      client.query('UPDATE messages SET content=content, upvotes=upvotes + 1 WHERE id=($1)',
+      [id]);
+      // SQL Query > Select Data
+      const query = client.query("SELECT * FROM messages ORDER BY id ASC");
+      // Stream results back one row at a time
+      query.on('row', (row) => {
+        results.push(row);
+      });
+      // After all data is returned, close connection and return results
+      query.on('end', function() {
+        done();
+        return res.json(results);
+      });
     });
-    // After all data is returned, close connection and return results
-    query.on('end', function() {
-      done();
-      return res.json(results);
-    });
-  });
+    return;
+  }
+  console.log("Not the necessary info in the request body: " + req.body);
+  res.json(500);
 })
 
 app.listen(app.get('port'), function () {
