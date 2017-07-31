@@ -11,14 +11,12 @@ const updateBookStatus = function (amount) {
     let status = parseInt(result) + amount;
     if (status < 0) { status = 0; }
     redis.set('bookstatus', status);
-    console.log("Updating book status by ("+amount+"). Current Energy: "+ status);
   });
 };
 module.exports.updateBookStatus = updateBookStatus;
 
 const getBookStatus = function (cb) {
   redis.get('bookstatus', function (err, result) {
-    console.log("Book Status: " + result);
     cb(result)
   });
 };

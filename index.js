@@ -4,6 +4,8 @@ const bodyParser = require('body-parser')
 const pg = require('pg');
 const connectionString = process.env.DATABASE_URL || 'postgres://postgres:dbpass@localhost:5433/ld';
 const book = require('./book.js');
+const dbpass = process.env.DBDROP_PASS;
+const canDrop = process.env.DBDROP_PASS !== undefined;
 
 app.set('port', (process.env.PORT || 3000));
 
@@ -121,6 +123,79 @@ app.post('/upvote', function (req, res) {
   console.log("Not the necessary info in the request body: " + req.body);
   res.json(500);
 })
+
+app.delete('/all/:dbpass', (req, res, next) => {
+  const results = [];
+  if (!canDrop) {
+    console.log("Cannot delete messages: No pass provided");
+    res.json(500);
+  } else {
+    if (dbpass === req.params.dbpass) {
+      // Get a Postgres client from the connection pool
+      pg.connect(connectionString, (err, client, done) => {
+        // Handle connection errors
+        if(err) {
+          done();
+          console.log(err);
+          return res.status(500).json({success: false, data: err});
+        }
+        // SQL Query > Delete Data
+        client.query('DELETE FROM messages');
+        // SQL Query > Select Data
+        var query = client.query('SELECT * FROM messages ORDER BY id ASC');
+        // Stream results back one row at a time
+        query.on('row', (row) => {
+          results.push(row);
+        });
+        // After all data is returned, close connection and return results
+        query.on('end', () => {
+          done();
+          return res.json(results);
+        });
+      });
+    } else {
+      console.log("Cannot delete message: Wrong password ("+req.params.dbpass+") expected "+dbpass);
+      res.json(500);
+    }
+  }
+});
+
+app.delete('/message/:id/:dbpass', (req, res, next) => {
+  const results = [];
+  const id = req.params.id;
+  if (!canDrop) {
+    console.log("Cannot delete messages: No pass provided");
+    res.json(500);
+  } else {
+    if (dbpass === req.params.dbpass) {
+      // Get a Postgres client from the connection pool
+      pg.connect(connectionString, (err, client, done) => {
+        // Handle connection errors
+        if(err) {
+          done();
+          console.log(err);
+          return res.status(500).json({success: false, data: err});
+        }
+        // SQL Query > Delete Data
+        client.query('DELETE FROM messages WHERE id=($1)', [id]);
+        // SQL Query > Select Data
+        var query = client.query('SELECT * FROM messages ORDER BY id ASC');
+        // Stream results back one row at a time
+        query.on('row', (row) => {
+          results.push(row);
+        });
+        // After all data is returned, close connection and return results
+        query.on('end', () => {
+          done();
+          return res.json(results);
+        });
+      });
+    } else {
+      console.log("Cannot delete message: Wrong password ("+req.params.dbpass+") expected "+dbpass);
+      res.json(500);
+    }
+  }
+});
 
 app.listen(app.get('port'), function () {
   console.log('Example app listening on port ' + app.get('port'))
