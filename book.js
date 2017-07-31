@@ -4,11 +4,12 @@ const redis = new Redis(redisurl);
 const redisport = 6379;
 
 const startingAmount = process.env.START_AMOUNT || 20160;
-const interval = process.env.BOOK_INTERVAL || 5000;
+const interval = process.env.BOOK_INTERVAL || 1000;
 
 const updateBookStatus = function (amount) {
   getBookStatus((result) => {
     let status = parseInt(result) + amount;
+    if (status < 0) { status = 0; }
     redis.set('bookstatus', status);
     console.log("Updating book status by ("+amount+"). Current Energy: "+ status);
   });
@@ -23,5 +24,11 @@ const getBookStatus = function (cb) {
 };
 module.exports.getBookStatus = getBookStatus;
 
-redis.set('bookstatus', startingAmount);
+redis.get('bookstatus', function (err, result) {
+  let status = parseInt(result);
+  if(status == 0) {
+    redis.set('bookstatus', startingAmount);
+  }
+});
+
 setInterval(() => {updateBookStatus(-1)}, interval);
