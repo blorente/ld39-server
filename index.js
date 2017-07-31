@@ -140,7 +140,8 @@ app.delete('/all/:dbpass', (req, res, next) => {
           return res.status(500).json({success: false, data: err});
         }
         // SQL Query > Delete Data
-        client.query('DELETE FROM messages');
+        client.query('TRUNCATE TABLE messages RESTART IDENTITY;');
+        createTable();
         // SQL Query > Select Data
         var query = client.query('SELECT * FROM messages ORDER BY id ASC');
         // Stream results back one row at a time
@@ -159,7 +160,7 @@ app.delete('/all/:dbpass', (req, res, next) => {
     }
   }
 });
-
+/*
 app.delete('/message/:id/:dbpass', (req, res, next) => {
   const results = [];
   const id = req.params.id;
@@ -176,15 +177,11 @@ app.delete('/message/:id/:dbpass', (req, res, next) => {
           console.log(err);
           return res.status(500).json({success: false, data: err});
         }
-        // SQL Query > Delete Data
         client.query('DELETE FROM messages WHERE id=($1)', [id]);
-        // SQL Query > Select Data
         var query = client.query('SELECT * FROM messages ORDER BY id ASC');
-        // Stream results back one row at a time
         query.on('row', (row) => {
           results.push(row);
         });
-        // After all data is returned, close connection and return results
         query.on('end', () => {
           done();
           return res.json(results);
@@ -196,12 +193,15 @@ app.delete('/message/:id/:dbpass', (req, res, next) => {
     }
   }
 });
-
+*/
 app.listen(app.get('port'), function () {
   console.log('Example app listening on port ' + app.get('port'))
+})
+
+function createTable() {
   const client = new pg.Client(connectionString);
   client.connect();
   const query = client.query(
     'CREATE TABLE IF NOT EXISTS messages(id SERIAL PRIMARY KEY, content TEXT not null, upvotes INT)');
   query.on('end', () => { client.end(); });
-})
+}
