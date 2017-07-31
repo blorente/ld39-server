@@ -3,8 +3,8 @@ const redisurl = process.env.REDIS_URL || "localhost:6379";
 const redis = new Redis(redisurl);
 const redisport = 6379;
 
-const startingAmount = process.env.START_AMOUNT || 20160;
-const interval = process.env.BOOK_INTERVAL || 1000;
+const startingAmount = process.env.START_AMOUNT || 20;
+const interval = process.env.BOOK_INTERVAL || 2000;
 
 const updateBookStatus = function (amount) {
   getBookStatus((result) => {
