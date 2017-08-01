@@ -31,13 +31,22 @@ app.get('/messages', function (req, res) {
   };
 
   let querystring = ''
-  if (!data.startid) {
+  if (!req.query.startid) {
     querystring = 'SELECT * FROM messages ORDER BY upvotes DESC;'
   } else if (!data.amount) {
-    querystring = 'SELECT * FROM messages ORDER BY upvotes DESC OFFSET ' + data.startid + ' ;'
+    if (data.startid != 0) {
+      querystring = 'SELECT * FROM messages ORDER BY upvotes DESC OFFSET ' + data.startid + ' ;'
+    } else {
+      querystring = 'SELECT * FROM messages ORDER BY upvotes DESC;'
+    }
   } else {
-    querystring = 'SELECT * FROM messages ORDER BY upvotes DESC OFFSET ' + data.startid + ' fetch first ' + data.amount + " rows only;"
+    if (data.startid != 0) {
+      querystring = 'SELECT * FROM messages ORDER BY upvotes DESC OFFSET ' + data.startid + ' fetch first ' + data.amount + " rows only;"
+    } else {
+      querystring = 'SELECT * FROM messages ORDER BY upvotes DESC fetch first ' + data.amount + " rows only;"
+    }
   }
+  console.log(querystring);
   pg.connect(connectionString, (err, client, done) => {
     // Handle connection errors
     if(err) {
