@@ -32,11 +32,11 @@ app.get('/messages', function (req, res) {
 
   let querystring = ''
   if (!data.startid) {
-    querystring = 'SELECT * FROM messages ORDER BY id ASC;'
+    querystring = 'SELECT * FROM messages ORDER BY upvotes DESC;'
   } else if (!data.amount) {
-    querystring = 'SELECT * FROM messages WHERE id >= ' + data.startid + 'ORDER BY id ASC;'
+    querystring = 'SELECT * FROM messages ORDER BY upvotes DESC OFFSET ' + data.startid + ' ;'
   } else {
-    querystring = 'SELECT * FROM messages WHERE id >= ' + data.startid + 'AND id < ' + (data.startid + data.amount) + ' ORDER BY id ASC;'
+    querystring = 'SELECT * FROM messages ORDER BY upvotes DESC OFFSET ' + data.startid + ' fetch first ' + data.amount + " rows only;"
   }
   pg.connect(connectionString, (err, client, done) => {
     // Handle connection errors
