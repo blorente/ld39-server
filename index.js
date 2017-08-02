@@ -175,7 +175,7 @@ app.delete('/all/:dbpass', (req, res, next) => {
     }
   }
 });
-/*
+
 app.delete('/message/:id/:dbpass', (req, res, next) => {
   const results = [];
   const id = req.params.id;
@@ -208,7 +208,7 @@ app.delete('/message/:id/:dbpass', (req, res, next) => {
     }
   }
 });
-*/
+
 app.listen(app.get('port'), function () {
   console.log('Example app listening on port ' + app.get('port'))
 })
